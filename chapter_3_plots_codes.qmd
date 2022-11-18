@@ -1,0 +1,816 @@
+---
+title: "Chapter 3 Plots"
+format: html
+editor: visual
+execute:
+  echo: false
+---
+
+## Figure 3.1: Distribution of Kinds of Degrees US Colleges Award
+
+We can see from the table below that, of the 7424 colleges in our data; 3495 of them (47.1%) predominantly grant degrees that take less than two years to complete, 1647 of them (22.2%) predominantly grant degrees that take two years to complete, and 2282 of them (30.7%) predominantly grant degrees that take four years or more to complete or advanced degrees. @fig-3.1 shows the same information in graph:
+
+```{r , warning=F, message=F}
+library(tidyverse)
+library(cowplot)
+library(reactable)
+# pmdplyr is not in CRAN, downloaded from github with devtools
+library(pmdplyr)
+```
+
+```{r, echo=FALSE}
+Number_of_colleges = c(3495,1647,2282)
+Type_of_degree=c("less than two years", "two years ","four years or more" )
+data=data.frame(Type_of_degree, Number_of_colleges)
+reactable::reactable(data)
+
+```
+
+```{r, echo=FALSE}
+ojs_define(
+  Number_of_colleges = Number_of_colleges,
+  Type_of_degree=Type_of_degree,
+  data=data)
+```
+
+```{ojs}
+//| label: fig-3.1
+//|fig-cap: "Distribution of Kinds of Degrees US Colleges Award"
+Plot.plot({
+  marks: [
+    Plot.barY(transpose(data), {x: "Type_of_degree", y: "Number_of_colleges", fill: "Number_of_colleges"}),
+    Plot.ruleY([0])
+  ],
+  color :{
+    type:"linear", scheme:"spectral", legend: true
+  },
+  style:{
+    fontSize: 14,
+    padding: "8px"  
+    
+  },
+  x:{
+    grid: true,
+    label: "Duration to attend Degree",
+    labelOffset: 38,
+  },
+  y:{
+    grid: true,
+    label: "Number of Colleges"
+    },
+    fx:{
+      inset:25,
+      lebelOffset: 40,
+      padding: .4
+    },
+  fy:{
+      inset:25,
+      lebelOffset: 40,
+      padding: .4
+    },
+  
+    
+})
+```
+
+## Figure 3.2: Distribution of Average Earnings across US College Cohorts
+
+For example, @fig-3.2 shows the distribution of the earnings of college graduates a few years after they graduate, with one observation per college per graduating class ("cohorts").
+
+```{r}
+data_2=data.frame(Scorecard)
+data_2=data_2[!is.na(data_2$earnings_med),]
+
+```
+
+```{r, echo= FALSE}
+ojs_define(
+   data_2=data_2
+  )
+```
+
+```{ojs}
+//| label: fig-3.2
+//| fig-cap: "Histogram of Average Earnings of This College & Cohort's Graduates"
+Plot.plot({
+  marks: [
+    Plot.rectY(transpose(data_2), Plot.binX({y: "count"}, {x: "earnings_med", thresholds: 15, fill: "steelblue"})),
+    Plot.ruleY([0])
+  ],
+  
+  x: {
+    label: "Average Earnings of This College & Cohort's Graduates",
+    labelOffset: 39,
+    labelAnchor: "center",
+    domain: [0,120000]
+  },
+  y: {
+    grid: true,
+    label: "Number of students"
+    
+  },
+  style:{
+    fontSize: 14,
+    padding: "16px"  
+    
+  },
+  fx:{
+      inset:25,
+      
+      padding: .4
+    },
+  fy:{
+      inset:25,
+      lebelOffset: 40,
+      padding: .4
+    }
+  
+  
+})
+```
+
+## Figure 3.3
+
+In @fig-3.3 we have illustrated that when we reduce the width of each bars and increase the number of bars in the histogram, it converges to the density plot of the distribution. Here, you can the number of bars in the histogram to visualize:
+
+```{r}
+rd = rnorm(n=37000, mean=30000,sd=5000)
+no=1:37000
+data_3=data.frame(no,rd)
+mini=min(rd)
+maxi=max(rd)
+```
+
+```{r, echo=FALSE}
+ojs_define(
+  no=no,rd=rd,data_3=data_3,mini=mini,maxi=maxi
+  )
+```
+
+```{ojs}
+//|label: fig-3.3
+//| fig-cap: "Histogram of a Normal Random Variable"
+Plot.plot({
+  marks: [
+    Plot.rectY(transpose(data_3), Plot.binX({y: "count"}, {x: "rd", thresholds: number_of_bars , fill: "steelblue"})),
+    Plot.ruleY([0])
+  ],
+  x: {
+    label: "The realizations of a random normal variable",
+    labelOffset: 39,
+    labelAnchor: "center"
+  },
+  y: {
+    grid: true,
+    label: "Total number of observations"
+    
+  },
+  style:{
+    fontSize: 14,
+    padding: "16px"  
+    
+  },
+  fx:{
+      inset:25,
+      
+      padding: .4
+    },
+  fy:{
+      inset:25,
+      lebelOffset: 40,
+      padding: .4
+    }
+  
+})
+```
+
+```{ojs}
+viewof number_of_bars = Inputs.range([1, 20], {value: 5, step: 1, label: "Number of Bars in the Histogram"})
+```
+
+#### Density plot of the same:
+
+Here in @fig-3.3.2 we have plotted the density of the distribution to get a clear view of what is following:
+
+```{ojs}
+//|label: fig-3.3.2
+//|fig-cap: "Density Plot of a Normal Random Variable"
+Plot.plot({
+  y: {
+    grid: true
+  },
+  marks: [
+    Plot.areaY(transpose(data_3), Plot.binX({y: "count", filter: null}, {x: "rd", fill: "#ccc"})),
+    Plot.lineY(transpose(data_3), Plot.binX({y: "count", filter: null}, {x: "rd"})),
+    Plot.ruleY([0])
+  ],
+  x: {
+    label: "The realizations of a random normal variable",
+    labelOffset: 41,
+    labelAnchor: "center"
+  },
+  y: {
+    grid: true,
+    label: "Total number of observations"
+    
+  },
+  style:{
+    fontSize: 15,
+    padding: "18px"  
+    
+  },
+  fx:{
+      inset:25,
+      
+      padding: .4
+    },
+  fy:{
+      inset:25,
+      lebelOffset: 40,
+      padding: .4
+    }
+  
+})
+```
+
+## Figure 3.4
+
+In @fig-3.4 we have illustrated the area covered under the density plot. We can describe the probability of being in a given range of the variable by seeing how large the area underneath the distribution is. Thus shading the area in a range will give an idea of the probability.
+
+```{ojs}
+d3 = require("d3@7")
+```
+
+```{ojs}
+someCloses = rd.map(d => d > lower_range && d< higher_range ? d : NaN)
+prob_calc = rd.map(d => d > lower_range && d< higher_range ? 1 : 0)
+s=d3.sum(prob_calc)
+p_someCloses= s /rd.length
+```
+
+```{ojs}
+//|label: fig-3.4
+//|fig-cap: "Probability from area Under the density curve"
+
+Plot.plot({
+  y: {
+    grid: true
+  },
+  marks: [
+    Plot.areaY(transpose(data_3), Plot.binX({y: "count", filter: null}, {x: someCloses, fill: "#ccc"})),
+    Plot.lineY(transpose(data_3), Plot.binX({y: "count", filter: null}, {x: "rd"})),
+    Plot.ruleY([0])
+  ],
+  x: {
+    label: "The realizations of a random normal variable",
+    labelOffset: 41,
+    labelAnchor: "center"
+  },
+  y: {
+    grid: true,
+    label: "Total number of observations"
+    
+  },
+  style:{
+    fontSize: 15,
+    padding: "18px"  
+    
+  },
+  fx:{
+      inset:25,
+      
+      padding: .4
+    },
+  fy:{
+      inset:25,
+      lebelOffset: 40,
+      padding: .4
+    },
+    
+  caption: `The probability between ${lower_range} and ${higher_range} is ${p_someCloses}`
+})
+```
+
+```{ojs}
+viewof lower_range = Inputs.range([mini, maxi], {value: 10000, step: 100, label: "select lowest range"})
+
+```
+
+```{ojs}
+viewof higher_range = Inputs.range([lower_range, maxi], {value: lower_range, step: 100, label: "select highest range"})
+```
+
+## Figure 3.5
+
+Now, @fig-3.5 give us an idea of the percentile of a distribution. The Xth percentile of a variable's distribution is the value for which X% of the observations are less. 
+
+```{ojs}
+percentile_decimal= percentile/100
+quantile_value= d3.quantile(rd,percentile_decimal )
+someCloses_new = rd.map(d => d < quantile_value  ? d : NaN)
+```
+
+```{ojs}
+//|label: fig-3.5
+//|fig-cap: "Percentile of a distribution"
+Plot.plot({
+  y: {
+    grid: true
+  },
+  marks: [
+    Plot.areaY(transpose(data_3), Plot.binX({y: "count", filter: null}, {x: someCloses_new, fill: "steelblue"})),
+    Plot.lineY(transpose(data_3), Plot.binX({y: "count", filter: null}, {x: "rd"})),
+    Plot.ruleY([0])
+  ],
+  x: {
+    label: "The realizations of a random normal variable",
+    labelOffset: 41,
+    labelAnchor: "center"
+  },
+  y: {
+    grid: true,
+    label: "Total number of observations"
+    
+  },
+  style:{
+    fontSize: 15,
+    padding: "18px"  
+    
+  },
+  fx:{
+      inset:25,
+      
+      padding: .4
+    },
+  fy:{
+      inset:25,
+      lebelOffset: 40,
+      padding: .4
+    },
+    
+  caption: `The ${percentile}th percentile of the distribution is ${quantile_value} `
+})
+```
+
+```{ojs}
+viewof percentile = Inputs.range([0,100], {value: 50, step: 1, label: "Please select the percentile %"})
+```
+
+## Figure 3.6
+
+@fig-3.6 illustrate how the graph of a distribution changes when we increase the variation eventually. The way that variation shows up in a distribution graph is in how *wide* the distribution is. We see that the graph becomes somewhat shorter and the tails of the graph increases. In other words, it becomes short and fat.
+
+```{ojs, echo=FALSE}
+sd=Math.sqrt(vari)
+```
+
+```{ojs, echo=FALSE}
+xd=Array.from({length: 1000}, d3.randomNormal(0,sd))
+
+```
+
+```{ojs}
+//|label: fig-3.6
+//|fig-cap: "Plot illustrating change in graph with change in variance"
+Plot.plot({
+  y: {
+    grid: true
+  },
+  marks: [
+    
+    Plot.lineY( xd,Plot.binX({y: "count", filter: null})),
+    Plot.ruleY([0])
+  ],
+  
+  x: {
+    label: "The realizations of a random normal variable",
+    labelOffset: 41,
+    labelAnchor: "center",
+    domain: [-30,30]
+  },
+  y: {
+    grid: true,
+    label: "Total number of observations",
+    domain: [0,220]
+    
+  },
+  style:{
+    fontSize: 15,
+    padding: "18px"  
+    
+  },
+  fx:{
+      inset:25,
+      
+      padding: .4
+    },
+  fy:{
+      inset:25,
+      lebelOffset: 40,
+      padding: .4
+    }
+})
+```
+
+```{ojs}
+viewof vari = Inputs.range([1,50], {value: 25, step: 1, label: "Please select the Variance "})
+```
+
+## Figure 3.7:
+
+In @fig-3.7 we have illustrated how each standard deviation away from the mean actually looks like in a graph. We have plotted lines (based on your input) indicating the standard deviation where the central line is the mean. We have used standard normal distribution for a better illustration.
+
+```{ojs}
+std_div=d3.deviation(xd)
+x_point1=sd_2*std_div
+x_point2=-sd_2*std_div
+x_point3=d3.mean(xd)
+
+```
+
+```{ojs}
+//|label: fig-3.7
+//|fig-cap: "Plot illustrating the change distance of the different standard deviations from the mean"
+Plot.plot({
+  y: {
+    grid: true
+  },
+  marks: [
+    
+    Plot.lineY( xd,Plot.binX({y: "count", filter: null})),
+    Plot.ruleY([0]),
+    Plot.ruleX([x_point1]),
+    Plot.ruleX([x_point2]),
+    Plot.ruleX([x_point3])
+  ],
+  
+  x: {
+    label: "The realizations of a random normal variable",
+    labelOffset: 41,
+    labelAnchor: "center",
+    domain: [-30,30]
+  },
+  y: {
+    grid: true,
+    label: "Total number of observations",
+    domain: [0,220]
+    
+  },
+  style:{
+    fontSize: 15,
+    padding: "18px"  
+    
+  },
+  fx:{
+      inset:25,
+      
+      padding: .4
+    },
+  fy:{
+      inset:25,
+      lebelOffset: 40,
+      padding: .4
+    },
+  caption: `The mean is${x_point3} and the standard deviation is ${std_div}`  
+})
+```
+
+```{ojs}
+viewof sd_2 = Inputs.radio([0,1,2,3], {label: "Select Standard deviation from mean:"})
+```
+
+## Figure 3.8
+
+In @fig-3.8 we have tried to plot the two percentile (lower percentile and higher percentile) of the distribution. The area in between will give then interquartile range.
+
+```{ojs}
+lower_percentile_decimal= lower_percentile/100
+higher_percentile_decimal= higher_percentile/100
+lower_quantile_value= d3.quantile(xd,lower_percentile_decimal)
+higher_quantile_value= d3.quantile(xd,higher_percentile_decimal)
+median_1=d3.median(xd)
+iqr=higher_quantile_value-lower_quantile_value
+```
+
+```{ojs}
+//|label: fig-3.8
+//|fig-cap: "Graph illustrating the inter quartlie range"
+Plot.plot({
+  y: {
+    grid: true
+  },
+  marks: [
+    Plot.lineY( xd,Plot.binX({y: "count", filter: null})),
+    Plot.ruleY([0]),
+    Plot.ruleX([lower_quantile_value]),
+    Plot.ruleX([higher_quantile_value]),
+    Plot.ruleX([median_1])
+  ],
+  
+  x: {
+    label: "The realizations of a random normal variable",
+    labelOffset: 41,
+    labelAnchor: "center",
+    domain: [-30,30]
+  },
+  y: {
+    grid: true,
+    label: "Total number of observations",
+    domain: [0,220]
+    
+  },
+  style:{
+    fontSize: 15,
+    padding: "18px"  
+    
+  },
+  fx:{
+      inset:25,
+      
+      padding: .4
+    },
+  fy:{
+      inset:25,
+      lebelOffset: 40,
+      padding: .4
+    },
+  caption: `The inter quartile range is ${iqr}`
+})
+```
+
+```{ojs}
+viewof lower_percentile = Inputs.range([0,50], {value: 25, step: 1, label: "Please select a percentile % from 0 to 50"})
+viewof higher_percentile = Inputs.range([50,100], {value: 75, step: 1, label: "Please select a percentile % from 50 to 100"})
+```
+
+## Figure 3.9:
+
+Here in @fig-3.9 we have plotted a positively skewed data.
+
+I choose the data set from [here](https://www.kaggle.com/datasets/mastmustu/income) .It is a data set on the income of the people of Korea. In the following plot we can clearly see a positively skewed pattern.
+
+```{r, warning=F, message=F}
+library(readr)
+data_4= read_csv("train.csv")
+income=data_4$fnlwgt
+
+```
+
+Now a plot of the same:
+
+```{r, echo=FALSE}
+ojs_define(
+  income=income
+  )
+```
+
+```{ojs}
+//|label: fig-3.9
+//|fig-cap:"Positively skewed graph illustrating th personal income of Koreans"
+Plot.plot({
+  marks: [
+    Plot.lineY( income,Plot.binX({y: "count", filter: null})),
+    Plot.ruleY([0])
+  ],
+  style:{
+    fontSize: 14,
+    padding: "10px"  
+    
+  },
+  x:{
+    grid: true,
+    label: "Income ->",
+    labelOffset: 38,
+    labelAnchor: "center"
+  },
+  y:{
+    grid: true,
+    label: "Number of people"
+    },
+    fx:{
+      inset:25,
+      lebelOffset: 40,
+      padding: .4
+    },
+  fy:{
+      inset:25,
+      lebelOffset: 40,
+      padding: .4
+    },
+  
+})
+```
+
+## Figure 3.10:
+
+One way of handling skew in data is by *transforming* the data. If we apply some function to the data that shrinks the impact of those really-big observations, the mean and variance work better. A common transformation in this case is the *log* transformation, where we take the natural logarithm of the data and use that instead. This can make the data much better-behaved.
+
+In @fig-3.10 , we have plotted the log of the incomes and have notices that the shape changes from a positively skewed to almost a symmetric.
+
+```{r, echo=FALSE}
+log_income=log(income)
+```
+
+```{r, echo=FALSE}
+ojs_define(
+  log_income=log_income
+  )
+```
+
+```{ojs}
+//|label: fig-3.10
+//|fig-cap: "Plot of Log transformation of the income"
+Plot.plot({
+  marks: [
+    Plot.lineY( log_income,Plot.binX({y: "count", filter: null})),
+    Plot.ruleY([0])
+  ],
+  style:{
+    fontSize: 14,
+    padding: "10px"  
+    
+  },
+  x:{
+    grid: true,
+    label: "Income ->",
+    labelOffset: 38,
+    labelAnchor: "center"
+  },
+  y:{
+    grid: true,
+    label: "Number of people"
+    },
+    fx:{
+      inset:25,
+      lebelOffset: 40,
+      padding: .4
+    },
+  fy:{
+      inset:25,
+      lebelOffset: 40,
+      padding: .4
+    },
+  
+})
+```
+
+## Figure 3.11:
+
+Here we try to match a a random sample with a theoritical distribution. @fig-3.11 shows how a sample distribution fits to its theoritical distribution when the sample size is increased.
+
+Here I use standard normal distribution:
+
+```{r, echo=FALSE}
+x=seq(-5,5,0.01)
+y=dnorm(x,0,1)
+data_6=data.frame(x,y)
+x_emp=rnorm(n=100, mean = 0, sd = 1)
+```
+
+```{r, echo=FALSE}
+ojs_define(
+  x=x,y=y,data_6=data_6,x_emp=x_emp
+  )
+```
+
+```{ojs}
+sample_dist=x_emp.slice(0,number_of_obs+1)
+```
+
+```{ojs}
+//|label: fig-3.11
+//|fig-cap: "Plot of Standard Normal distribution"
+Plot.plot({
+  marks: [
+    Plot.line( transpose(data_6), {y: "y", x: "x", stroke:"steelblue"}),
+    Plot.lineY(sample_dist, Plot.binX({y: "proportion", filter: null})),
+    
+    Plot.ruleY([0])
+  ],
+  style:{
+    fontSize: 15,
+    padding: "10px"  
+    
+  },
+  x:{
+    grid: true,
+    label: "Observation value",
+    labelOffset: 38,
+    labelAnchor: "center"
+  },
+  y:{
+    grid: true,
+    label: "Proportion of observation",
+    domain: [0,0.8]
+    },
+    fx:{
+      inset:25,
+      lebelOffset: 40,
+      padding: .4
+    },
+  fy:{
+      inset:25,
+      lebelOffset: 40,
+      padding: .4
+    },
+  
+    caption: "This plot shows how sample distribution merges to theoritical distribution as sample size increases"
+})
+```
+
+```{ojs}
+viewof number_of_obs = Inputs.range([1, 100], {value: 50, step: 1, label: "Select the number of Observations:"})
+
+```
+
+## Figure 3.12:
+
+Here we have given examples of theoretical distributions. we have plotted two distributions: @fig-3.12.1 shows a standard normal distribution and @fig-3.12.2 shows a log normal distribution.
+
+```{r, echo=FALSE}
+x_1=seq(0,20,0.1)
+y_1=dlnorm(x_1, meanlog = 0, sdlog = 1, log = FALSE)
+data_7=data.frame(x_1,y_1)
+```
+
+```{r, echo=FALSE}
+ojs_define(
+  x_1=x_1,y_1=y_1,data_7=data_7
+  )
+```
+
+```{ojs}
+//|label: fig-3.12.1
+//|fig-cap: "Standard Normal distribution"
+Plot.plot({
+  marks: [
+    Plot.line( transpose(data_6), {y: "y", x: "x", stroke:"steelblue"}),
+    Plot.ruleY([0])
+  ],
+  style:{
+    fontSize: 15,
+    padding: "10px"  
+    
+  },
+  x:{
+    grid: true,
+    label: "x -->",
+    labelOffset: 38,
+    labelAnchor: "center"
+  },
+  y:{
+    grid: true,
+    label: "f(x)"
+    },
+    fx:{
+      inset:25,
+      lebelOffset: 40,
+      padding: .4
+    },
+  fy:{
+      inset:25,
+      lebelOffset: 40,
+      padding: .4
+    },
+  
+    
+})
+
+```
+
+```{ojs}
+//|label: fig-3.12.2
+//|fig-cap: "Log Normal Distribution"
+Plot.plot({
+  marks: [
+    Plot.line( transpose(data_7), {y: "y_1", x: "x_1", stroke:"red"}),
+    Plot.ruleY([0])
+  ],
+  style:{
+    fontSize: 16,
+    padding: "10px"  
+    
+  },
+  x:{
+    grid: true,
+    label: "x-->",
+    labelOffset: 38,
+    labelAnchor: "center"
+  },
+  y:{
+    grid: true,
+    label: "f(x)"
+    },
+    fx:{
+      inset:25,
+      lebelOffset: 40,
+      padding: .4
+    },
+  fy:{
+      inset:25,
+      lebelOffset: 40,
+      padding: .4
+    },
+
+})
+```
