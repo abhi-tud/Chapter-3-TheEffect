@@ -8,7 +8,7 @@ execute:
 
 ## Figure 3.1: Distribution of Kinds of Degrees US Colleges Award
 
-We can see from the table below that, of the 7424 colleges in our data; 3495 of them (47.1%) predominantly grant degrees that take less than two years to complete, 1647 of them (22.2%) predominantly grant degrees that take two years to complete, and 2282 of them (30.7%) predominantly grant degrees that take four years or more to complete or advanced degrees. @fig-3.1 shows the same information in graph:
+We can see from the table below that, of the 7424 colleges in our data; 3495 of them (47.1%) predominantly grant degrees that take less than two years to complete, 1647 of them (22.2%) predominantly grant degrees that take two years to complete, and 2282 of them (30.7%) predominantly grant degrees that take four years or more to complete or advanced degrees. @fig-3.1 shows the same information in the form of a graph:
 
 ```{r , warning=F, message=F}
 library(tidyverse)
